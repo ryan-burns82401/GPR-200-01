@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string>
+#include <fstream>
 
 #include "gpro/gpro-math/gproVector.h"
 
@@ -56,6 +58,18 @@ void testVector()
 int main(int const argc, char const* const argv[])
 {
 	testVector();
+
+#ifdef __cplusplus
+
+	std::ofstream file("image.txt");
+	std::string test = "Hello.";
+
+	file << test << std::endl;
+	file.close();
+
+#else
+
+#endif
 
 	printf("\n\n");
 	system("pause");
