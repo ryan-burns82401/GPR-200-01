@@ -31,8 +31,6 @@
 #include <iostream>
 
 #include "gpro/gpro-math/gproVector.h"
-#include "color.h"
-#include "vec3.h"
 
 
 void testVector()
