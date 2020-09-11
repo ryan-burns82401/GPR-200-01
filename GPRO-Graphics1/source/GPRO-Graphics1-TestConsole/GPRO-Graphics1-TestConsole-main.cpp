@@ -72,14 +72,14 @@ int main(int const argc, char const* const argv[])
 
 	fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-	for (int j = image_height - 1; j >= 0; j--) //int j starts at 256, subtracts 1 for every loop
+	for (int j = image_height - 1; j >= 0; j--) //int j starts at 255, subtracts 1 for every loop
 	{
 		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush; //progress indicator
 
 		for (int i = 0; i < image_width; i++) //int i starts at 0, adds 1 for every loop
 		{
-			double r = double(i) / static_cast<double>(image_width - 1); //increases as i increases
-			double g = double(j) / static_cast<double>(image_height - 1); //decreases as j decreases
+			double r = double(i) / static_cast<double>(image_width - 1); //increases as i increases (0 to 1)
+			double g = double(j) / static_cast<double>(image_height - 1); //decreases as j decreases (1 to 0)
 			double b = 0.25f; //always 0.25
 
 			int ir = static_cast<int>(255.999 * r); //value for red: 0 -> 255
