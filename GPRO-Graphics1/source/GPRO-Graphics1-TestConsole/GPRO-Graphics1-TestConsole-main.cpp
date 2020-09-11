@@ -18,8 +18,8 @@
 	GPRO-Graphics1-TestConsole-main.c/.cpp
 	Main entry point source file for a Windows console application.
 
-	Modified by: ____________
-	Modified because: ____________
+	Modified by: Ryan Burns
+	Modified because: Code for creating a .ppm image had to be added in main()
 */
 
 
@@ -62,6 +62,9 @@ int main(int const argc, char const* const argv[])
 
 #ifdef __cplusplus
 
+	//Citation for this section
+	https://raytracing.github.io/books/RayTracingInOneWeekend.html
+
 	const int image_width = 256; //image dimensions
 	const int image_height = 256;
 
@@ -69,27 +72,37 @@ int main(int const argc, char const* const argv[])
 
 	fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-	for (int j = image_height - 1; j >= 0; j--)
+	for (int j = image_height - 1; j >= 0; j--) //int j starts at 256, subtracts 1 for every loop
 	{
 		std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush; //progress indicator
 
-		for (int i = 0; i < image_width; i++)
+		for (int i = 0; i < image_width; i++) //int i starts at 0, adds 1 for every loop
 		{
-			double r = double(i) / static_cast<double>(image_width - 1);
-			double g = double(j) / static_cast<double>(image_height - 1);
-			double b = 0.25f;
+			double r = double(i) / static_cast<double>(image_width - 1); //increases as i increases
+			double g = double(j) / static_cast<double>(image_height - 1); //decreases as j decreases
+			double b = 0.25f; //always 0.25
 
-			int ir = static_cast<int>(255.999 * r);
-			int ig = static_cast<int>(255.999 * g);
-			int ib = static_cast<int>(255.999 * b);
+			int ir = static_cast<int>(255.999 * r); //value for red: 0 -> 255
+			int ig = static_cast<int>(255.999 * g); //value for green: 255 -> 0
+			int ib = static_cast<int>(255.999 * b); //value for blue: constant 63
 
-			fout << ir << ' ' << ig << ' ' << ib << '\n';
+			fout << ir << ' ' << ig << ' ' << ib << '\n'; //output the sets of values to image.ppm
 		}
 	}
 
-	std::cerr << "\nDone.\n";
+	std::cerr << "\nDone.\n"; //file has been read
 
-	fout.close();
+	fout.close(); //close output file
+
+
+	// I thought I should include this somewhere, but I'm really sorry that I didn't get very far in this assignment.
+	// I was working on Chapter 3 in the reading, but what I was doing wasn't working.
+	// I've been mostly focusing on an assignment for CSI-281 this week, and it took most of the time that I planned
+	// to spend on this assignment. I decided that I would be auditing CSI-281 on Thursday, but most of my time for
+	// this assignment was already gone. I just wanted to say that the quality of my work will not be like this
+	// going forward, since I now only have one programming class this semester. My plan is to just do a short recording
+	// of what I have right now, submit it, and read through the rest of Ray Tracing in One Weekend sometime before
+	// I start working on Lab 2. It's been a very stressful week for me, I hope you understand.
 
 #else
 
