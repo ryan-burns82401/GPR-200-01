@@ -1,0 +1,60 @@
+/*
+	Name: Ryan Burns
+	Class: GPR-200-01
+	Date: 9/16/2020
+*/
+
+vec4 myEffect0(in vec2 fragCoord) // Effect #0
+{
+    vec2 uv = fragCoord / iResolution.xy; // Current pixel coordinate / Output resolution
+    									  // Red: 0 -> 1	Green: 1 -> 0
+    
+    vec3 color = vec3(uv, 0.25);  // uv is red and green, 0.25 is blue
+    float alpha = 1.0;	  		  // alpha value (1.0 means full brightness)
+    
+    return vec4(color, alpha);	  // returns vec3 color and alpha value
+}
+
+vec4 myEffect1(in vec2 fragCoord, in vec2 resolution) // Effect #1
+{
+    vec4 white = vec4(1.0, 1.0, 1.0, 1.0); // displays white
+    vec4 black = vec4(0.0, 0.0, 0.0, 1.0); // displays black
+    
+    // check to see if the x and y coordinates of the current pixel are both even
+    if (((mod(fragCoord.x, 2.0)) >= 1.0) && ((mod(fragCoord.y, 2.0)) >= 1.0))
+    {
+        return white; // yes: the pixel is set to white
+    }
+    // check to see if the x and y coordinates of the current pixel are both odd
+    else if (((mod(fragCoord.x, 2.0)) <= 1.0) && ((mod(fragCoord.y, 2.0)) <= 1.0))
+    {
+        return white; // yes: the pixel is set to white
+    }
+    // if the above cases fail...
+    else
+    {
+        return black; // no: the pixel is set to black
+    }
+}
+
+vec4 myEffect2(in vec2 fragCoord, in vec2 resolution) // Effect #2
+{
+    vec4 color1 = vec4(0.0, 1.0, 1.0, 1.0); // background color (light blue)
+    vec4 color2 = vec4(1.0, 0.0, 0.0, 1.0); // circle color (red)
+    
+	vec2 center = iResolution.xy * 0.5;		// finds the center of the screen
+    										// based on the resolution
+	float radius = iResolution.y * 0.25;	// the radius of the circle, set to
+    										// 1/4 the height of the screen
+    
+    return color1;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) // Outputs the image to the screen
+{
+    // fragColor = myEffect0(fragCoord);				 // Effect #0
+    
+    // fragColor = myEffect1(fragCoord, iResolution.xy); // Effect #1
+    
+    // fragColor = myEffect2(fragCoord, iResolution.xy); // Effect #2
+}
