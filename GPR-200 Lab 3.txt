@@ -1,3 +1,12 @@
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Date: 9/23/20
+
+	Credits: Dan Buckstein (starter functions)
+	- calcViewport, calcRay, calcColor and mainImage
+*/
+
 // calcViewport: calculate the viewing plane (viewport) coordinate
 //    viewport:       output viewing plane coordinate
 //    ndc:            output normalized device coordinate
@@ -44,31 +53,44 @@ void calcRay(out vec4 rayDirection, out vec4 rayOrigin,
     rayDirection = vec4(viewport.x, viewport.y, -focalLength, 0.0);
 }
 
+// sphere: a struct for a sphere object (not currently used)
+// 	  center: corrdinates for the center of the sphere
+//	  radius: radius of the sphere
 struct sphere
 {
     vec4 center;
     float radius;
 };
 
+// hit_sphere: tests if a ray hits the sphere
+//    center        corrdinates for the center of the sphere
+//    radius:       radius of the sphere
+//    rayDirection: input direction of ray from origin
+//    rayOrigin:    input origin point of ray
 float hit_sphere(vec4 center, float radius, in vec4 rayDirection, in vec4 rayOrigin)
 {
     vec4 oc = rayOrigin - center;
     
-    float a = dot(rayDirection, rayDirection);
-    float b = 2.0 * dot(oc, rayDirection);
-    float c = dot(oc, oc) - radius * radius;
-    float discriminant = b * b - 4.0 * a * c;
+    float a = length(rayDirection) * length(rayDirection);
+    float half_b = dot(oc, rayDirection);
+    float c = (length(oc) * length(oc)) - (radius * radius);
+    float discriminant = half_b * half_b - a * c;
     
+    // discriminant less than 0 will return -1
     if (discriminant < 0.0) 
     {
         return -1.0;
     }
+    // discriminant greater than 0 returns the following equation's result
     else 
     {
-        return (-b - sqrt(discriminant)) / (2.0 * a);
+        return (-half_b - sqrt(discriminant)) / a;
     }
 }
 
+// evaluate: determines which point on the sphere was hit
+//    rayDirection: input direction of ray from origin
+//    rayOrigin:    input origin point of ray
 vec4 evaluate(in vec4 rayDirection, in vec4 rayOrigin, in float t)
 {
     return rayOrigin + t * rayDirection;
@@ -80,19 +102,18 @@ vec4 evaluate(in vec4 rayDirection, in vec4 rayOrigin, in float t)
 vec4 calcColor(in vec4 rayDirection, in vec4 rayOrigin)
 {
     float t = hit_sphere(vec4(0.0, 0.0, -1.0, 1.0), 0.5, rayDirection, rayOrigin);
+    
     if (t > 0.0)
     {
+        // sphere was hit, calculates color accordingly
         vec4 N = normalize(evaluate(rayDirection, rayOrigin, t) - vec4(0.0, 0.0, -1.0, 1.0));
         return 0.5 * vec4(N.x + 1.0, N.y + 1.0, N.z + 1.0, 1.0);
     }
     
+    // sphere was not hit, colors the background
     vec4 unit_direction = normalize(rayDirection);
     t = 0.5 * (unit_direction.y + 1.0);
     return (1.0 - t) * vec4(1.0, 1.0, 1.0, 1.0) + t * vec4(0.5, 0.7, 1.0, 1.0);
-    
-    // DUMMY RESULT: OUTPUT RAY DIRECTION AS-IS
-    // -> what does the ray look like as color?
-    //return rayDirection;
 }
 
 // mainImage: process the current pixel (exactly one call per pixel)
@@ -116,10 +137,4 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
 
     // color
     fragColor = calcColor(rayDirection, rayOrigin);
-
-    // TEST COLOR:
-    //  -> what do the other things calculated above look like?
-    //fragColor = vec4(viewport, 0.0, 0.0);
-    //fragColor = vec4(ndc, 0.0, 0.0);
-    //fragColor = vec4(uv, 0.0, 0.0);
 }
