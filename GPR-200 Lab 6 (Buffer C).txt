@@ -1,0 +1,67 @@
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Date: 10/9/20
+	Last Modified: 10/15/20
+
+	Credits: GLSL Starter Code by Daniel S. Buckstein
+			 GLSL Starter Function by Daniel S. Buckstein
+			 (mainImage)
+*/
+
+//  -> BUFFER C TAB
+
+//------------------------------------------------------------
+// SHADERTOY MAIN
+
+// mainImage: process the current pixel (exactly one call per pixel)
+//    fragColor: output final color for current pixel
+//    fragCoord: input location of current pixel in image (in pixels)
+void mainImage(out color4 fragColor, in sCoord fragCoord)
+{
+    // setup
+    // test UV for input image
+    sCoord uv = fragCoord / iChannelResolution[0].xy;
+    
+    // TESTING
+    // sample from Buffer B
+    fragColor = texture(iChannel0, uv);
+    
+    // colors of the current pixel, and surrounding pixels (3x3 area)
+    // naming: color(column)(row)
+    // example: color22 -> second column, second row -> center/current pixel
+    vec4 color13 = texture(iChannel0, vec2(fragCoord.x - 1.0, fragCoord.y + 1.0));
+    vec4 color23 = texture(iChannel0, vec2(fragCoord.x, fragCoord.y + 1.0));
+    vec4 color33 = texture(iChannel0, vec2(fragCoord.x + 1.0, fragCoord.y + 1.0));
+    vec4 color12 = texture(iChannel0, vec2(fragCoord.x - 1.0, fragCoord.y));
+    vec4 color22 = texture(iChannel0, vec2(fragCoord.x, fragCoord.y));
+    vec4 color32 = texture(iChannel0, vec2(fragCoord.x + 1.0, fragCoord.y));
+    vec4 color11 = texture(iChannel0, vec2(fragCoord.x - 1.0, fragCoord.y - 1.0));
+    vec4 color21 = texture(iChannel0, vec2(fragCoord.x, fragCoord.y - 1.0));
+    vec4 color31 = texture(iChannel0, vec2(fragCoord.x + 1.0, fragCoord.y - 1.0));
+    
+    // luminance values of the current pixel, and surrounding pixels (3x3 area)
+    // naming: (same as above)
+    float lum13 = (0.2126 * color13.r) + (0.7152 * color13.g) + (0.0722 * color13.b);
+    float lum23 = (0.2126 * color23.r) + (0.7152 * color23.g) + (0.0722 * color23.b);
+    float lum33 = (0.2126 * color33.r) + (0.7152 * color33.g) + (0.0722 * color33.b);
+    float lum12 = (0.2126 * color12.r) + (0.7152 * color12.g) + (0.0722 * color12.b);
+    float lum22 = (0.2126 * color22.r) + (0.7152 * color22.g) + (0.0722 * color22.b);
+    float lum32 = (0.2126 * color32.r) + (0.7152 * color32.g) + (0.0722 * color32.b);
+    float lum11 = (0.2126 * color11.r) + (0.7152 * color11.g) + (0.0722 * color11.b);
+    float lum21 = (0.2126 * color21.r) + (0.7152 * color21.g) + (0.0722 * color21.b);
+    float lum31 = (0.2126 * color31.r) + (0.7152 * color31.g) + (0.0722 * color31.b);
+    
+    // "weighted average"
+    // current pixel has the strongest weight,
+    // surrounding pixels have less
+    mat3 blur = mat3(1.0, 2.0, 1.0, 2.0, 4.0, 2.0, 1.0, 2.0, 1.0) * 1.0/16.0;
+    
+    // matrix containing luminance values
+    mat3 area = mat3(lum13, lum23, lum33, lum12, lum22, lum32, lum11, lum21, lum31);
+    
+    // multiply the luminance values by the weighted average
+    mat3 gaussian = (blur * area);
+    
+    //fragColor = vec4(gaussian);
+}

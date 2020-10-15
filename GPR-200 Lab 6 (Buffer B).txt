@@ -1,0 +1,42 @@
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Date: 10/9/20
+	Last Modified: 10/15/20
+
+	Credits: GLSL Starter Code by Daniel S. Buckstein
+			 GLSL Starter Function by Daniel S. Buckstein
+			 (mainImage)
+*/
+
+//  -> BUFFER B TAB
+
+//------------------------------------------------------------
+// SHADERTOY MAIN
+
+// mainImage: process the current pixel (exactly one call per pixel)
+//    fragColor: output final color for current pixel
+//    fragCoord: input location of current pixel in image (in pixels)
+void mainImage(out color4 fragColor, in sCoord fragCoord)
+{   
+    // setup
+    // test UV for input image
+    sCoord uv = fragCoord / iChannelResolution[0].xy;
+    
+    // TESTING
+    // sample from Buffer A
+    fragColor = texture(iChannel0, uv);
+    
+    // the light intensity of the current pixel
+    // luminance function: 0.2126R + 0.7152G + 0.0722B
+    // light = 1.0, dark = 0.0
+    float luminance = (0.2126 * fragColor.r) + (0.7152 * fragColor.g) + (0.0722 * fragColor.b);
+    
+    // an equation using luminance:
+    // light areas stay light, anything that is
+    // not very light becomes much darker
+    float exposure = (1.0 / (4.0 * (sqrt((-8.0 * luminance) + 8.0))) - 0.09);
+    
+    // set current pixel color to exposure
+    fragColor = vec4(exposure);
+}
