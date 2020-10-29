@@ -1,0 +1,48 @@
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Date: 10/17/20
+	Last Modified: 10/28/20
+
+	Credits: GLSL Starter Code by Daniel S. Buckstein
+			 GLSL Starter Function by Daniel S. Buckstein
+			 (mainImage)
+
+	The following link was used as a reference for the Ripple Effect:
+	https://www.geeks3d.com/20110316/shader-library-simple-2d-effects-sphere-and-ripple-in-glsl/
+*/
+
+//  -> BUFFER B (add ripple effect)
+
+	// Part of Assignment: Textures & Multipass
+
+//------------------------------------------------------------
+// SHADERTOY MAIN
+
+// mainImage: process the current pixel (exactly one call per pixel)
+//    fragColor: output final color for current pixel
+//    fragCoord: input location of current pixel in image (in pixels)
+void mainImage(out color4 fragColor, in sCoord fragCoord)
+{ 
+    // setup
+    // UV for input image
+    sCoord uv = fragCoord / iChannelResolution[0].xy;
+    
+    // intensity of ripple effect
+    float intensity = 0.02;
+    
+    // centers the starting point of the ripple
+    vec2 p = (2.0 * fragCoord.xy / iChannelResolution[0].xy) - 1.0;
+    
+    // length of 'p'
+    float d = length(p);
+    
+    // updated UV for input image, creates ripple effect
+    uv = (fragCoord.xy / iChannelResolution[0].xy) + (p / d) * cos(d * 14.0 - iTime * 4.0) * intensity;
+    
+    // sample from Buffer A, apply ripple effect
+    vec3 col = texture(iChannel0, uv).xyz;
+    
+    // TESTING
+    fragColor = vec4(col, 1.0);
+}

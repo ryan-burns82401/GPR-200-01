@@ -1,0 +1,44 @@
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Date: 10/17/20
+	Last Modified: 10/28/20
+
+	Credits: GLSL Starter Code by Daniel S. Buckstein
+			 GLSL Starter Function by Daniel S. Buckstein
+			 (mainImage)
+*/
+
+//  -> IMAGE TAB (final output)
+
+	// Part of Assignment: Textures, Multipass & Output to the Screen
+
+//------------------------------------------------------------
+// SHADERTOY MAIN
+
+// mainImage: process the current pixel (exactly one call per pixel)
+//    fragColor: output final color for current pixel
+//    fragCoord: input location of current pixel in image (in pixels)
+void mainImage(out color4 fragColor, in sCoord fragCoord)
+{
+    // setup
+    // test UV for input image
+    sCoord uv = fragCoord / iChannelResolution[0].xy;
+    
+    // TESTING
+    // sample from Buffer B
+    fragColor = texture(iChannel0, uv);
+    
+    //----------------------------------------------------
+    // BUFFER SET UP GUIDE
+    
+    // Buffer A: iChannel0 -> any cubemap
+    
+    // Buffer B: iChannel0 -> Buffer A
+    
+    // Buffer C: iChannel0 -> Buffer B
+    
+    // Image:    iChannel0 -> Buffer C
+    
+    // MULTIPASS: A -> B -> C -> Image
+}

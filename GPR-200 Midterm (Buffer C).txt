@@ -1,0 +1,211 @@
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Date: 10/17/20
+	Last Modified: 10/28/20
+
+	Credits: GLSL Starter Code by Daniel S. Buckstein
+			 GLSL Starter Functions by Daniel S. Buckstein
+			 (calcColor, mainImage)
+*/
+
+//  -> BUFFER C TAB (sphere and lighting)
+
+	// Part of Assignment: Textures, Multipass, Lighting & Shading, Interactivity
+
+//------------------------------------------------------------
+// RENDERING FUNCTIONS
+
+// calcColor: calculate the color of current pixel
+//	  vp:  input viewport info
+//	  ray: input ray info
+color4 calcColor(in sViewport vp, in sRay ray)
+{
+    // test inputs
+    //return color4(ray.direction.xyz == vp.viewportPoint.xyz); // pass
+    //return color4(lengthSq(vp.viewportPoint.xy) >= 0.25); // pass
+    //return color4(vp.uv, 0.0, 0.0);
+    //return color4(vp.ndc, 0.0, 0.0);
+    //return asPoint(sBasis(vp.viewportPoint.xy, -vp.viewportPoint.z));
+    
+    // create objects
+    sViewport mouse_vp;
+    sSphere sphere;
+    sPointLight light_1;
+    
+    // initialize objects
+    initViewport(mouse_vp, vp.size.y, vp.focalLength, iMouse.xy, vp.resolution);
+    initSphere(sphere, mouse_vp.viewportPoint.xyz, 0.5);
+    initPointLight(light_1, vec3(0.0, 0.0, 1.0), vec4(0.1, 0.75, 1.0, 1.0), 40.0);
+    
+    vec3 dp;
+    dp.xy = ray.direction.xy - sphere.center.xy;
+    
+    // length of 'dp.xy' squared
+    float lSq = lengthSq(dp.xy);
+    
+    // raduis squared
+    float rSq = sphere.radius * sphere.radius;
+    
+    // the current point is part of the sphere
+    if (lSq <= rSq)
+    {
+        dp.z = rSq - lSq;
+        
+        // surface of the sphere at the current point
+        vec3 position = sphere.center.xyz + vec3(dp.x, dp.y, sqrt(dp.z));
+        
+        // normal vector of the surface of the sphere
+        vec3 normal = (position - sphere.center.xyz) / sphere.radius;
+        
+        //return vec4(normal * 0.5 + 0.5, 1.0);
+        //-----------------------------------------------
+        
+        // LAMBERTIAN REFLECTANCE
+        
+        // displacement between the center of the light
+        // and the surface of the sphere at the current point
+        // NOT LENGTH
+        vec3 light_vector = light_1.center.xyz - position;
+        
+        // distance between the center of the light
+        // and the surface of the sphere at the current point
+        // DISTANCE <=> LENGTH
+        float d = length(light_vector);
+        
+        // normal of the light vector
+        // DISPLACEMENT / DISTANCE (same as 'normal' above)
+        vec3 L = light_vector / d;
+        
+        // intensity of the light (from struct)
+        float intensity = light_1.intensity;
+        
+        // attenuated intensity
+        float aI = 1.0 / (1.0 + (d / intensity) + ((d * d) / (intensity * intensity)));
+        
+        // diffuse coefficient
+        float dC = max(0.0, dot(normal, L));
+        
+        // diffuse intensity
+        float dI = dC * aI;
+        
+        // without attenuation
+        //return vec4(dC, dC, dC, 1.0);
+        
+        // with attenuation
+        //return vec4(dI, dI, dI, 1.0);
+        //-----------------------------------------------
+        
+        // diffuse reflection color (color of the surface)
+        // currently set to light blue
+        vec4 dRC = vec4(0.1, 0.75, 1.0, 1.0);
+        
+        // light color (from struct)
+        vec4 light_color = light_1.color;
+        
+        // final surface color
+        vec4 C = dI * dRC * light_color;
+        
+        //return C;
+        //-----------------------------------------------
+        
+        // PHONG REFLECTANCE
+        
+        // highlight exponent
+        float a = 32.0;
+        
+        // displacement between the view position
+        // and the surface of the sphere at the current point
+        // NOT LENGTH
+        vec3 view_vector = ray.origin.xyz - position;
+        
+        // distance between the view position
+        // and the surface of the sphere at the current point
+        // DISTANCE <=> LENGTH
+        float d2 = length(view_vector);
+        
+        // normal of the view vector
+        // DISPLACEMENT / DISTANCE (same as 'normal' and 'L' above)
+        vec3 V = view_vector / d2;
+        
+        // reflected light vector about the normal
+        vec3 R = reflect(-L, normal);
+        
+        // specular coefficient (Phong)
+        float sC = max(0.0, dot(V, R));
+        
+        // specular intensity (Phong)
+        float sI = pow(sC, a);
+        
+        //return vec4(sI, sI, sI, 1.0);
+        //-----------------------------------------------
+        
+        // global ambient intensity
+        float gaI = 1.0;
+        
+        // global ambient color
+        // currently set to dark blue
+        vec4 gaC = vec4(0.1, 0.2, 0.6, 1.0);
+        
+        // specular reflection color
+        // currently set to white
+        vec4 sRC = vec4(1.0, 1.0, 1.0, 1.0);
+        
+        // final surface color
+        vec4 C2 = (gaI * gaC) + (((dI * dRC) + (sI * sRC)) * light_color);
+        
+        //return C2;
+        //-----------------------------------------------
+        
+        // BLINN-PHONG REFLECTANCE
+        
+        // average of the light and view vectors
+        vec3 halfway_vector = (light_vector + view_vector) * 0.5;
+        
+        // distance of the halfway vector
+        float d3 = length(halfway_vector);
+        
+        // normal of the halfway vector
+        vec3 H = halfway_vector / d3;
+        
+        // specular coefficient (Blinn-Phong)
+        float sC2 = max(0.0, dot(normal, H));
+        
+        // specular intensity (Blinn-Phong)
+        float sI2 = pow(sC2, (a * 4.0));
+        
+        // final surface color
+        vec4 C3 = (gaI * gaC) + (((dI * dRC) + (sI2 * sRC)) * light_color);
+        
+        return C3;
+        //-----------------------------------------------
+    }
+    
+    // the current point is NOT part of the sphere
+    // (just output the background from Buffer B)
+    return texture(iChannel0, vp.uv);
+}
+
+//------------------------------------------------------------
+// SHADERTOY MAIN
+
+// mainImage: process the current pixel (exactly one call per pixel)
+//    fragColor: output final color for current pixel
+//    fragCoord: input location of current pixel in image (in pixels)
+void mainImage(out color4 fragColor, in sCoord fragCoord)
+{
+    // viewing plane (viewport) inputs
+    const sBasis eyePosition = sBasis(0.0);
+    const sScalar viewportHeight = 2.0, focalLength = 1.5;
+    
+    // viewport info
+    sViewport vp;
+
+    // ray
+    sRay ray;
+    
+    // render
+    initViewport(vp, viewportHeight, focalLength, fragCoord, iResolution.xy);
+    initRayPersp(ray, eyePosition, vp.viewportPoint.xyz);
+    fragColor += calcColor(vp, ray);
+}
