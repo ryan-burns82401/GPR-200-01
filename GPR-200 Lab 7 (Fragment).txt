@@ -1,0 +1,55 @@
+#version 450
+// #version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Lab 7
+	Date: 10/30/20
+	Last Modified: 11/5/20
+*/
+
+#ifdef GL_ES
+precision highp float;
+#endif // GL_ES
+
+layout (location = 0) out vec4 rtFragColor;
+
+// Texture Uniform
+uniform sampler2D Texture0;
+
+// Varying
+// Per-Vertex: receive final color
+//in vec4 vColor;
+
+// used for Per-Vertex shading
+in vec4 PerVertex;
+
+// Per-Fragment: receive requirements for final color
+in vec4 vNormal;
+//in vec2 vTexcoord;
+in vec4 vTexcoord;
+
+void main()
+{
+	// a texture of the Earth to be applied to the sphere
+	vec4 earthTexture = texture(Texture0, vTexcoord.xy);
+	
+	//rtFragColor = vec4(0.0, 1.0, 1.0, 1.0);
+	
+	// Per-Vertex: input is final color
+	//rtFragColor = vColor;
+	
+	rtFragColor = PerVertex;
+	
+	// Per-Fragment: inputs used to calculate final color
+	//vec4 N = normalize(vNormal);
+	//rtFragColor = vec4(N.xyz * 0.5 + 0.5, 1.0);
+	
+	//rtFragColor = vec4(vTexcoord);
+	
+	rtFragColor = earthTexture;
+}
+
+// What Went Right: Per-Vertex shading (Lambertian & Phong), Texturing
+// What Went Wrong: Per-Fragment shading, Lighting & Texturing at the same time, rotating the texture
