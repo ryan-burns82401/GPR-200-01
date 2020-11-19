@@ -1,0 +1,52 @@
+#version 450
+//#version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Lab 8
+	Date: 11/13/20
+	Last Modified: 11/18/20
+*/
+
+// BUFFER A: SCENE PASS
+
+#ifdef GL_ES
+precision highp float;
+#endif // GL_ES
+
+layout (location = 0) out vec4 rtFragColor;
+
+// Texture Uniform
+uniform sampler2D uTexture0;
+
+// Varying
+in vec4 vNormal;
+in vec2 vTexcoord;
+in vec4 vClip;
+
+// used for Per-Vertex shading
+in vec4 PerVertex;
+
+void main()
+{
+	// vTexcoord is the same as the uv
+	vec2 uv = vTexcoord;
+	
+	// Apply Color/Texture/Shading to the Spheres:
+	
+	// a landscape texture to be applied
+	// to each of the spheres
+	vec4 col = texture(uTexture0, uv);
+
+	// Testing
+	
+	// output with TEXTURES
+	rtFragColor = col;
+	
+	// output with SOLID COLOR
+	//rtFragColor = vec4(0.2, 0.5, 0.7, 1.0);
+	
+	// output with PHONG SHADING
+	//rtFragColor = PerVertex;
+}

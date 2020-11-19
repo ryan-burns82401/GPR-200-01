@@ -1,0 +1,57 @@
+#version 450
+//#version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Lab 8
+	Date: 11/13/20
+	Last Modified: 11/18/20
+*/
+
+// BUFFER B: DISPLAY PASS
+
+#ifdef GL_ES
+precision highp float;
+#endif // GL_ES
+
+layout (location = 0) out vec4 rtFragColor;
+
+// Resolution Uniform
+uniform vec2 uResolution;
+
+// Texture Uniform
+uniform sampler2D uTex;
+
+// Varying
+in vec2 vTexcoord;
+
+void main()
+{
+	// DISPLAY PASS: draw texture
+	//vec2 uv = gl_FragCoord.xy / uResolution;
+	vec2 uv = vTexcoord;
+	vec4 col = texture(uTex, uv);
+	
+	// Perfrom a Bright Pass:
+	
+	// the light intensity of the current pixel
+    // luminance function: 0.2126R + 0.7152G + 0.0722B
+    // light = 1.0, dark = 0.0
+    float luminance = (0.2126 * col.r) + (0.7152 * col.g) + (0.0722 * col.b);
+    
+    // an equation using luminance:
+    // light areas stay light, anything that is
+    // not very light becomes much darker
+    float exposure = (1.0 / (4.0 * (sqrt((-8.0 * luminance) + 8.0))) - 0.0884);
+    
+    // set current pixel color to exposure
+    rtFragColor = vec4(exposure);
+	
+	// Testing
+	//rtFragColor = vec4(1.0, 0.5, 0.0, 1.0);
+	//rtFragColor = vec4(uv, 0.0, 1.0);
+	
+	// output original color
+	rtFragColor = col;
+}

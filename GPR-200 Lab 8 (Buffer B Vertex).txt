@@ -1,0 +1,30 @@
+#version 450
+//#version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Lab 8
+	Date: 11/13/20
+	Last Modified: 11/18/20
+*/
+
+// BUFFER B: DISPLAY PASS
+
+layout (location = 0) in vec4 aPosition;
+//layout (location = 2) in vec4 aTexcoord;
+
+// Varying
+out vec2 vTexcoord;
+
+void main()
+{
+	// set gl_Position
+	gl_Position = aPosition;
+	
+	// vTexcoord = aTexcoord;
+	
+	// where a certain pixel will appear on the geometry
+	// (for this pass: the full-screen quad)
+	vTexcoord = aPosition.xy * 0.5 + 0.5;
+}
