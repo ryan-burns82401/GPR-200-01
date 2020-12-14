@@ -1,0 +1,58 @@
+#version 450
+// #version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Final
+	Date: 12/1/20
+	Last Modified: 12/14/20
+*/
+
+// BUFFER A (VERTEX)
+
+// Part of the Project: Interactivity, Textures (Cubemap & Render Texture), Multipass
+
+layout (location = 0) in vec4 aPosition;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec4 aTexCoord;
+
+// Mouse Uniform
+uniform vec4 click;
+
+// Varying
+out vec4 vTexCoord;
+out float left_state;
+out float right_state;
+
+void main()
+{
+	// used to determine whether the left mouse
+	// button is down or not
+	left_state = 1.0;
+	
+	// used to determine whether the right mouse
+	// button is down or not
+	right_state = 1.0;
+
+	// if the left mouse button is down,
+	// add one to the left state variable
+	if (click.z == 1.0)
+	{
+		left_state++;
+	}
+	
+	// if the right mouse button is down,
+	// add one to the right state variable
+	if (click.w == 1.0)
+	{
+		right_state++;
+	}
+
+	// where a certain pixel will appear on the geometry
+	// (for this pass: the full-screen quad)
+	vTexCoord = aPosition;
+	
+	// set gl_Position
+	gl_Position = aPosition;
+}

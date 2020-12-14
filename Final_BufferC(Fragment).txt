@@ -1,0 +1,36 @@
+#version 450
+// #version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Final
+	Date: 12/1/20
+	Last Modified: 12/14/20
+*/
+
+// BUFFER C (FRAGMENT)
+
+// Part of the Project: Data Structures & Functions, Lighting,
+//						Textures (Render Texture), Multipass
+
+#ifdef GL_ES
+precision highp float;
+#endif // GL_ES
+
+layout (location = 0) out vec4 rtFragColor;
+
+// Texture Uniform
+uniform sampler2D uTex;
+
+// Varying
+in vec4 vTexCoord;
+
+// used for Per-Vertex shading
+in vec4 PerVertex;
+
+void main()
+{
+	// output with Phong Shading
+	rtFragColor = PerVertex;
+}

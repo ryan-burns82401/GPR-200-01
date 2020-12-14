@@ -1,0 +1,73 @@
+#version 450
+// #version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Final
+	Date: 12/1/20
+	Last Modified: 12/14/20
+	
+	Credits: GLSL Starter Function by Daniel S. Buckstein
+			 (lengthSq)
+*/
+
+// IMAGE (FRAGMENT)
+
+// Part of the Project: Data Structures & Functions, Textures (Render Texture), Multipass
+
+#ifdef GL_ES
+precision highp float;
+#endif // GL_ES
+
+layout (location = 0) out vec4 rtFragColor;
+
+// Texture Uniforms
+uniform sampler2D uSphereTex;
+uniform sampler2D uTex;
+
+// Varying
+in vec4 vTexCoord;
+in vec4 vPos;
+in vec3 sphereCenter;
+in float sphereRadius;
+
+//-----------------------------------
+// lengthSq: calculate the squared length of a vector type
+//    x: input whose squared length to calculate
+float lengthSq(vec2 x)
+{
+    return dot(x, x);
+}
+
+void main()
+{
+	// DISPLAY PASS: draw texture
+	vec2 uv = vTexCoord.xy;
+
+	// used when checking if a certain pixel
+	// is inside the sphere
+    vec2 inSphere = vPos.xy - sphereCenter.xy;
+    
+    // length of 'inSphere' squared
+    float lSq = lengthSq(inSphere);
+    
+    // raduis squared
+    float rSq = sphereRadius * sphereRadius;
+    
+    // the current point is part of the sphere
+    // (output sphere from Buffer C)
+    if (lSq <= rSq)
+    {
+    	vec4 col = texture(uSphereTex, uv);
+		rtFragColor = col;
+    }
+    
+    // the current point is NOT part of the sphere
+    // (output background from Buffer B)
+	else
+	{
+		vec4 col = texture(uTex, uv);
+		rtFragColor = col;
+	}
+}

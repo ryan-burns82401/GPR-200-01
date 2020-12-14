@@ -1,0 +1,31 @@
+#version 450
+// #version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Final
+	Date: 12/1/20
+	Last Modified: 12/14/20
+*/
+
+// BUFFER B (VERTEX)
+
+// Part of the Project: Textures (Render Texture), Multipass
+
+layout (location = 0) in vec4 aPosition;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec4 aTexCoord;
+
+// Varying
+out vec4 vTexCoord;
+
+void main()
+{
+	// set gl_Position
+	gl_Position = aPosition;
+	
+	// where a certain pixel will appear on the geometry
+	// (for this pass: the full-screen quad)
+	vTexCoord = aPosition * 0.5 + 0.5;
+}

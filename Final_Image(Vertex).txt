@@ -1,0 +1,84 @@
+#version 450
+// #version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Final
+	Date: 12/1/20
+	Last Modified: 12/14/20
+	
+	Credits: GLSL Starter Functions by Daniel S. Buckstein
+			 (asPoint, asOffset)
+*/
+
+// IMAGE (VERTEX)
+
+// Part of the Project: Data Structures & Functions, Textures (Render Texture), Multipass
+
+layout (location = 0) in vec4 aPosition;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec4 aTexCoord;
+
+// Varying
+out vec4 vTexCoord;
+out vec4 vPos;
+out vec3 sphereCenter;
+out float sphereRadius;
+
+//-----------------------------------
+// asPoint: promote a 3D vector into a 4D vector representing a point (w=1)
+//    point: input 3D vector
+vec4 asPoint(in vec3 point)
+{
+    return vec4(point, 1.0);
+}
+
+// asOffset: promote a 3D vector into a 4D vector representing an offset (w=0)
+//    offset: input 3D vector
+vec4 asOffset(in vec3 offset)
+{
+    return vec4(offset, 0.0);
+}
+
+// sSphere: structure for a sphere object
+//	  center: coordinates of the center of the sphere
+//    radius: raduis of the sphere
+struct sSphere
+{
+    vec4 center;
+    float radius;
+};
+    
+// initSphere: initializes a sphere object given the parameters listed above
+void initSphere(out sSphere sphere, in vec3 center, in float radius)
+{
+    sphere.center = asPoint(center);
+    sphere.radius = radius;
+}
+
+void main()
+{
+	// set gl_Position
+	gl_Position = aPosition;
+	
+	// where a certain pixel will appear on the geometry
+	// (for this pass: the full-screen quad)
+	vTexCoord = aPosition * 0.5 + 0.5;
+	
+	//-----------------------------------
+	// create sphere
+	sSphere area;
+	
+	// initialize sphere
+	initSphere(area, vec3(0.0, 0.0, 0.0), 0.25);
+	
+	// setting the value of sphereCenter to the sphere struct value
+	sphereCenter = (area.center).xyz;
+	
+	// setting the value of sphereRadius to the sphere struct value
+	sphereRadius = area.radius;
+	
+	// setting the vPos varying to aPosition
+	vPos = aPosition;
+}

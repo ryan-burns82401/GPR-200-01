@@ -1,0 +1,83 @@
+#version 450
+// #version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Final
+	Date: 12/1/20
+	Last Modified: 12/14/20
+*/
+
+// BUFFER A (FRAGMENT)
+
+// Part of the Project: Interactivity, Textures (Cubemap & Render Texture), Multipass
+
+#ifdef GL_ES
+precision highp float;
+#endif // GL_ES
+
+layout (location = 0) out vec4 rtFragColor;
+
+// Texture Uniform
+uniform samplerCube skybox;
+
+// Time Uniform
+uniform float iTime;
+
+// Varying
+in vec4 vTexCoord;
+in float left_state;
+in float right_state;
+
+void main()
+{
+	// inital viewport direction
+	vec3 cubeLoc = vec3(vTexCoord.xy, 1.0);
+    
+    // rotation matrix
+    mat3 rotationY;
+    
+    // used in rotation speed and direction
+    // (used with 'sin' and 'cos')
+    float x;
+    
+    // cubemap rotation speed
+    float rotationSpeed = 0.15;
+    
+    // if the left mouse button IS down: display mirrored view
+    // (counter-clockwise rotation)
+    if ((mod(left_state, 2.0)) == 0.0)
+    {
+    	x = iTime * rotationSpeed;
+    }
+
+    // if the right mouse button IS down: display default view
+    // (no rotation, facing initial direction)
+    else if ((mod(right_state, 2.0)) == 0.0)
+    {
+    	x = iTime * 0.0;
+    }
+
+	// if NO mouse buttons are down: display normal view
+	// (clockwise rotation)
+    else
+    {
+    	x = iTime * -(rotationSpeed);
+    }
+    
+    // variables for 'sin' and 'cos' over time
+    float c = cos(x);
+    float s = sin(x);
+    
+    // rotation matrix implementation
+    // (rotation around the y-axis)
+    rotationY = mat3(+c, 0.0, +s, 0.0, 1.0, 0.0, -s, 0.0, +c);
+    
+    // changes the viewport direction
+    // according to the rotation matrix
+    cubeLoc = rotationY * cubeLoc;
+    
+    // output the rotating cubemap texture
+    rtFragColor = texture(skybox, cubeLoc);
+}

@@ -1,0 +1,59 @@
+#version 450
+// #version 300 es
+
+/*
+	Author: Ryan Burns
+	Class: GPR-200-01
+	Assignment: Final
+	Date: 12/1/20
+	Last Modified: 12/14/20
+*/
+
+// BUFFER B (FRAGMENT)
+
+// Part of the Project: Textures (Render Texture), Multipass
+
+#ifdef GL_ES
+precision highp float;
+#endif // GL_ES
+
+layout (location = 0) out vec4 rtFragColor;
+
+// Texture Uniform
+uniform sampler2D uTex;
+
+// Time Uniform
+uniform float iTime;
+
+// Varying
+in vec4 vTexCoord;
+
+void main()
+{
+	// DISPLAY PASS: draw texture
+	vec2 uv = vTexCoord.xy;
+	
+    // intensity of ripple effect
+    float intensity = 0.02;
+    
+    // frequency of ripples
+    float frequency = 14.0;
+    
+    // speed of effect
+    float speed = 4.0;
+    
+    // centers the starting point of the ripple
+    vec2 p = (2.0 * uv) - 1.0;
+    
+    // length of 'p'
+    float d = length(p);
+    
+    // updated UV for input image, creates ripple effect
+    uv = (uv) + (p / d) * cos(d * frequency - iTime * speed) * intensity;
+    
+    // sample from Buffer A, apply ripple effect
+    vec4 col = texture(uTex, uv);
+    
+    // output cubemap with ripple effect
+	rtFragColor = col;
+}
